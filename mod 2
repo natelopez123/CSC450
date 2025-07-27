@@ -8,15 +8,15 @@ int main() {
     for (int i = 0; i < 3; ++i) {
         cout << "Attempt " << (i + 1) << endl;
 
-        cout << "Enter the first string: ";
+        cout << "First string: ";
         getline(cin, firstInput);
 
-        cout << "Enter the second string: ";
+        cout << "Second string: ";
         getline(cin, secondInput);
 
         combined = firstInput + secondInput;
 
-        cout << "Concatenated string: " << combined << "\n\n";
+        cout << "Combined string: " << combined << "\n\n";
     }
 
     return 0;
