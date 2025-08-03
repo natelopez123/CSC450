@@ -1,0 +1,45 @@
+// CSC450_CT3 
+// This program demonstrates the use of pointers and dynamic memory allocation.
+// It asks the user to input three integers, stores them using pointers and then
+// displays the values before releasing the memory.
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    // Declare integer variables
+    int num1, num2, num3;
+
+    // Ask user for three integers
+    cout << "Enter first integer: ";
+    cin >> num1;
+
+    cout << "Enter second integer: ";
+    cin >> num2;
+
+    cout << "Enter third integer: ";
+    cin >> num3;
+
+    // Create pointers and allocate memory using new
+    int* ptr1 = new int;
+    int* ptr2 = new int;
+    int* ptr3 = new int;
+
+    // Assign values to dynamically allocated memory
+    *ptr1 = num1;
+    *ptr2 = num2;
+    *ptr3 = num3;
+
+    // Display the values from both variables and pointers
+    cout << "\nOriginal values:\n";
+    cout << "num1 = " << num1 << ", *ptr1 = " << *ptr1 << endl;
+    cout << "num2 = " << num2 << ", *ptr2 = " << *ptr2 << endl;
+    cout << "num3 = " << num3 << ", *ptr3 = " << *ptr3 << endl;
+
+    // Free dynamically allocated memory
+    delete ptr1;
+    delete ptr2;
+    delete ptr3;
+
+    return 0;
+}
