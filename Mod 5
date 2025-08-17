@@ -1,0 +1,101 @@
+// CSC450_CT5.cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <filesystem>
+
+using namespace std;
+
+// --- Header block without the first line ---
+static const string kHeaderBlock =
+    "\n"
+    "Please be sure to append your data to this text file.\n"
+    "\n"
+    "If these first three lines are deleted, then your program is not functioning as expected.\n";
+
+// Ensure the required header exists at the top of the file
+void ensureHeader(const string& inputFile) {
+    if (!filesystem::exists(inputFile)) {
+        ofstream out(inputFile, ios::binary);
+        if (!out) {
+            cerr << "Could not create the file: " << inputFile << endl;
+            return;
+        }
+        out << kHeaderBlock << "\n";
+        return;
+    }
+
+    ifstream in(inputFile, ios::binary);
+    string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+    in.close();
+
+    // Check if header exists (look for the first instruction line)
+    bool hasHeader = content.find("Please be sure to append your data") == 0;
+    if (!hasHeader) {
+        ofstream out(inputFile, ios::binary | ios::trunc);
+        if (!out) {
+            cerr << "Could not update the file: " << inputFile << endl;
+            return;
+        }
+        out << kHeaderBlock << "\n" << content;
+    }
+}
+
+// Reverse the contents of one file into another
+void reverseFileContent(const string& inputFile, const string& outputFile) {
+    ifstream inFile(inputFile, ios::binary);
+    if (!inFile) {
+        cerr << "Could not open " << inputFile << " for reading." << endl;
+        return;
+    }
+
+    string content((istreambuf_iterator<char>(inFile)), istreambuf_iterator<char>());
+    inFile.close();
+
+    reverse(content.begin(), content.end());
+
+    ofstream outFile(outputFile, ios::binary | ios::trunc);
+    if (!outFile) {
+        cerr << "Could not create " << outputFile << " for writing." << endl;
+        return;
+    }
+    outFile << content;
+    outFile.close();
+}
+
+int main() {
+    const string inputFile  = "CSC450_CT5_mod5.txt";
+    const string outputFile = "CSC450-mod5-reverse.txt";
+
+    // Step 1: Ensure header is intact
+    ensureHeader(inputFile);
+
+    // Step 2: Get user input
+    cout << "Enter the text you would like to add to the file:" << endl;
+    string userInput;
+    getline(cin, userInput);
+
+    ofstream appendFile(inputFile, ios::app | ios::binary);
+    if (!appendFile) {
+        cerr << "Could not open " << inputFile << " for writing." << endl;
+        return 1;
+    }
+    appendFile << userInput << "\n";
+    appendFile.close();
+
+    cout << "Your text has been added to " << inputFile << "." << endl;
+
+    // Step 3: Create reversed copy
+    reverseFileContent(inputFile, outputFile);
+
+    cout << "A reversed copy of the file has been saved as " 
+         << outputFile << "." << endl;
+    cout << "All tasks completed successfully." << endl;
+
+    // Optional pause
+    cout << "Press Enter to exit...";
+    cin.get();
+
+    return 0;
+}
