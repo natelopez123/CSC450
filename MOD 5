@@ -1,0 +1,34 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+// Function to count up from 1 to 20
+void countUp() {
+    for (int i = 1; i <= 20; i++) {
+        cout << "Count Up: " << i << endl;
+        this_thread::sleep_for(chrono::milliseconds(200)); // simulate work
+    }
+}
+
+// Function to count down from 20 to 0
+void countDown() {
+    for (int i = 20; i >= 0; i--) {
+        cout << "Count Down: " << i << endl;
+        this_thread::sleep_for(chrono::milliseconds(200)); // simulate work
+    }
+}
+
+int main() {
+    // Create and run first thread (count up)
+    thread t1(countUp);
+    t1.join();  // Ensure t1 completes before moving to t2
+
+    // Create and run second thread (count down)
+    thread t2(countDown);
+    t2.join();
+
+    cout << "Threads completed." << endl;
+    return 0;
+}
