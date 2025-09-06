@@ -1,0 +1,87 @@
+// TwoThreadCounters.java
+
+public class TwoThreadCounters {
+
+    // Shared lock object used for coordination
+    private final Object lock = new Object();
+
+    // Flag to indicate threadOne finished counting up
+    private volatile boolean threadOneDone = false;
+
+    public static void main(String[] args) {
+        new TwoThreadCounters().start();
+    }
+
+    public void start() {
+        Thread threadOne = new Thread(new CounterUp(), "Counter-Up");
+        Thread threadTwo = new Thread(new CounterDown(), "Counter-Down");
+
+        // Start threadTwo first to illustrate waiting for the signal,
+        // then start threadOne which will perform the up-count and notify.
+        threadTwo.start();
+        threadOne.start();
+
+        // Wait for both threads to finish
+        try {
+            threadOne.join();
+            threadTwo.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Main interrupted while waiting for threads.");
+        }
+
+        System.out.println("Both threads completed.");
+    }
+
+    // Thread 1: counts up 0 -> 20, then signals threadTwo
+    private class CounterUp implements Runnable {
+        @Override
+        public void run() {
+            try {
+                for (int i = 0; i <= 20; i++) {
+                    System.out.printf("%s: %d%n", Thread.currentThread().getName(), i);
+                    // simulate work
+                    Thread.sleep(100);
+                }
+                // Signal that we are done
+                synchronized (lock) {
+                    threadOneDone = true;
+                    lock.notifyAll(); // wake waiting thread(s)
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("CounterUp interrupted.");
+            }
+        }
+    }
+
+    // Thread 2: waits until threadOneDone is true, then counts down 20 -> 0
+    private class CounterDown implements Runnable {
+        @Override
+        public void run() {
+            synchronized (lock) {
+                while (!threadOneDone) {
+                    try {
+                        // waiting for the signal that thread one finished counting up
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        System.err.println("CounterDown interrupted while waiting.");
+                        return;
+                    }
+                }
+            }
+
+            // Perform countdown
+            try {
+                for (int i = 20; i >= 0; i--) {
+                    System.out.printf("%s: %d%n", Thread.currentThread().getName(), i);
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("CounterDown interrupted during countdown.");
+            }
+        }
+    }
+}
